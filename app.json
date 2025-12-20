@@ -40,6 +40,12 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": "pk.eyJ1IjoieGx2ciIsImEiOiJjbWpkeXBjNzAwYXM3M2dxeG82cHVlcmFwIn0.PgVXEBKacOeuAqKcYhpLFQ"
+        }
       ]
     ],
     "experiments": {
