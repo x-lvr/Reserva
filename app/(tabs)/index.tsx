@@ -101,9 +101,19 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle={Platform.OS === 'ios' ? 'dark-content' : 'default'} />
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 32 }}>
-        <View style={styles.header}>
-          <Text style={styles.logo}>Reserva</Text>
-          <View style={styles.searchRow}>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.logo}>Reserva</Text>
+            <Text style={styles.greeting}>Good morning — find services near you</Text>
+          </View>
+          <Pressable style={styles.avatar} onPress={() => alert('Open profile')}>
+            <Text style={styles.avatarText}>R</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInner}>
+            <Text style={styles.searchIcon}>🔎</Text>
             <TextInput
               placeholder="Search services or providers"
               value={query}
@@ -124,14 +134,14 @@ export default function HomeScreen() {
       
       
       
-        <View style={styles.section}>
+        <View style={[styles.section, styles.card]}>
           <Text style={styles.sectionTitle}>Categories</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
             {mockCategories.map((c) => renderCategory({ item: c }))}
           </ScrollView>
         </View>
 
-        <View style={styles.section}>
+        <View style={[styles.section, styles.card]}>
           <Text style={styles.sectionTitle}>Featured</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ gap: 12 }}>
             {mockFeatured.map((f) => (
@@ -145,11 +155,11 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        <View style={styles.section}>
+        <View style={[styles.section, styles.card]}>
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionTitle}>Nearby</Text>
             <Link href="/map">
-              <Text style={styles.seeMap}>See map</Text>
+              <Text style={styles.seeMap}>Open map</Text>
             </Link>
           </View>
 
@@ -162,7 +172,7 @@ export default function HomeScreen() {
           />
         </View>
 
-        <View style={styles.section}>
+        <View style={[styles.section, styles.card]}>
           <Text style={styles.sectionTitle}>Map Preview</Text>
           <Link href="/map">
             <Image
@@ -172,11 +182,11 @@ export default function HomeScreen() {
           </Link>
         </View>
 
-        <View style={styles.section}>
+        <View style={[styles.section, styles.card]}>
           <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
           {mockBookings.map((b) => (
-            <View key={b.id} style={styles.bookingRow}>
-              <View>
+            <View key={b.id} style={styles.bookingCard}>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.bookingService}>{b.service}</Text>
                 <Text style={styles.bookingMeta}>{b.when} • {b.location}</Text>
               </View>
@@ -244,4 +254,13 @@ const styles = StyleSheet.create({
   iosButton: { backgroundColor: ACCENT, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
   iosButtonPressed: { opacity: 0.85 },
   iosButtonText: { color: '#fff', fontWeight: '700' },
+  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  greeting: { color: '#6B7280', marginTop: 2 },
+  avatar: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FFF6E5', alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: '#B45309', fontWeight: '800' },
+  searchContainer: { marginBottom: 12 },
+  searchInner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 6, elevation: 1 },
+  searchIcon: { marginRight: 8, fontSize: 18 },
+  bookingCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
 });
