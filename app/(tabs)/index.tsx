@@ -1,98 +1,247 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Platform,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+
+const ACCENT = '#F59E0B';
+const { width } = Dimensions.get('window');
+
+const mockCategories = [
+  { id: '1', title: 'Nails', emoji: '💅' },
+  { id: '2', title: 'Dentist', emoji: '🦷' },
+  { id: '3', title: 'Car Repair', emoji: '🔧' },
+  { id: '4', title: 'Massage', emoji: '💆‍♀️' },
+  { id: '5', title: 'Hair', emoji: '💇‍♂️' },
+];
+
+const mockNearby = [
+  {
+    id: 's1',
+    name: 'Sunny Nails Studio',
+    image: 'https://via.placeholder.com/160x120.png?text=Nails',
+    rating: 4.7,
+    distanceKm: 0.6,
+  },
+  {
+    id: 's2',
+    name: 'City Dental Care',
+    image: 'https://via.placeholder.com/160x120.png?text=Dentist',
+    rating: 4.5,
+    distanceKm: 1.2,
+  },
+  {
+    id: 's3',
+    name: 'Rapid Auto Repair',
+    image: 'https://via.placeholder.com/160x120.png?text=Auto',
+    rating: 4.3,
+    distanceKm: 2.3,
+  },
+];
+
+const mockFeatured = [
+  { id: 'f1', title: 'Holiday Mani — 20% Off', image: 'https://via.placeholder.com/320x140.png?text=Promo' },
+];
+
+const mockBookings = [
+  { id: 'b1', service: 'Nails — Classic Mani', when: 'Today, 3:00 PM', location: 'Sunny Nails Studio' },
+  { id: 'b2', service: 'Dentist — Checkup', when: 'Dec 25, 10:00 AM', location: 'City Dental Care' },
+];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [query, setQuery] = useState('');
+  const [nearby, setNearby] = useState(mockNearby);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  useEffect(() => {
+    // Placeholder for real location-based fetching.
+    // Keep mock data for now; could call an API and setNearby()
+  }, []);
+
+  function renderCategory({ item }: any) {
+    return (
+      <Pressable style={styles.categoryCard} key={item.id} android_ripple={{ color: '#eee' }} onPress={() => {}}>
+        <Text style={styles.categoryEmoji}>{item.emoji}</Text>
+        <Text style={styles.categoryTitle}>{item.title}</Text>
+      </Pressable>
+    );
+  }
+
+  function renderService({ item }: any) {
+    return (
+      <View style={styles.serviceCard}>
+        <Image source={{ uri: item.image }} style={styles.serviceImage} />
+        <View style={styles.serviceBody}>
+          <Text style={styles.serviceName}>{item.name}</Text>
+          <View style={styles.metaRow}>
+            <Text style={styles.rating}>⭐ {item.rating}</Text>
+            <Text style={styles.distance}>{item.distanceKm} km</Text>
+          </View>
+          <View style={styles.bookRow}>
+            <Pressable onPress={() => alert('Book ' + item.name)} style={({ pressed }) => [styles.iosButton, pressed && styles.iosButtonPressed]}>
+              <Text style={styles.iosButtonText}>Book Now</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle={Platform.OS === 'ios' ? 'dark-content' : 'default'} />
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 32 }}>
+        <View style={styles.header}>
+          <Text style={styles.logo}>Reserva</Text>
+          <View style={styles.searchRow}>
+            <TextInput
+              placeholder="Search services or providers"
+              value={query}
+              onChangeText={setQuery}
+              style={styles.searchInput}
+              clearButtonMode="while-editing"
+            />
+          </View>
+        </View>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Categories</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
+            {mockCategories.map((c) => renderCategory({ item: c }))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Featured</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ gap: 12 }}>
+            {mockFeatured.map((f) => (
+              <Pressable key={f.id} style={styles.featureCard} onPress={() => alert(f.title)}>
+                <Image source={{ uri: f.image }} style={styles.featureImage} />
+                <View style={styles.featureOverlay}>
+                  <Text style={styles.featureText}>{f.title}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>Nearby</Text>
+            <Link href="/map">
+              <Text style={styles.seeMap}>See map</Text>
+            </Link>
+          </View>
+
+          <FlatList
+            data={nearby}
+            keyExtractor={(i) => i.id}
+            renderItem={renderService}
+            horizontal={false}
+            scrollEnabled={false}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Map Preview</Text>
+          <Link href="/map">
+            <Image
+              source={{ uri: 'https://via.placeholder.com/600x200.png?text=Map+Preview' }}
+              style={styles.mapPreview}
+            />
+          </Link>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
+          {mockBookings.map((b) => (
+            <View key={b.id} style={styles.bookingRow}>
+              <View>
+                <Text style={styles.bookingService}>{b.service}</Text>
+                <Text style={styles.bookingMeta}>{b.when} • {b.location}</Text>
+              </View>
+              <Pressable onPress={() => alert('Open booking ' + b.id)} style={({ pressed }) => [styles.iosButton, pressed && styles.iosButtonPressed]}>
+                <Text style={styles.iosButtonText}>View</Text>
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: { flex: 1, backgroundColor: '#fff', paddingTop: 12, paddingHorizontal: 16 },
+  header: { marginBottom: 12 },
+  logo: { fontSize: 28, fontWeight: '700', color: '#111', marginBottom: 8 },
+  searchRow: { flexDirection: 'row', alignItems: 'center' },
+  searchInput: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+  section: { marginTop: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  categories: { flexDirection: 'row', gap: 12 },
+  categoryCard: {
+    width: 84,
+    height: 92,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  categoryEmoji: { fontSize: 28, marginBottom: 6 },
+  categoryTitle: { fontSize: 13, fontWeight: '600' },
+  featureCard: { width: width * 0.8, height: 140, borderRadius: 12, overflow: 'hidden', marginRight: 12 },
+  featureImage: { width: '100%', height: '100%' },
+  featureOverlay: { position: 'absolute', left: 12, bottom: 12 },
+  featureText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  seeMap: { color: ACCENT, fontWeight: '600' },
+  serviceCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, marginBottom: 12, overflow: 'hidden' },
+  serviceImage: { width: 120, height: 92 },
+  serviceBody: { flex: 1, padding: 10, justifyContent: 'space-between' },
+  serviceName: { fontSize: 16, fontWeight: '700' },
+  metaRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  rating: { color: '#374151', fontWeight: '600' },
+  distance: { color: '#6B7280' },
+  bookRow: { alignSelf: 'flex-start' },
+  mapPreview: { width: '100%', height: 160, borderRadius: 12 },
+  bookingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  bookingService: { fontWeight: '700' },
+  bookingMeta: { color: '#6B7280' },
+  safe: { flex: 1, backgroundColor: '#fff' },
+  iosButton: { backgroundColor: ACCENT, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  iosButtonPressed: { opacity: 0.85 },
+  iosButtonText: { color: '#fff', fontWeight: '700' },
 });
