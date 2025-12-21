@@ -1,7 +1,102 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { BlurView } from 'expo-blur';
 import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
-import { PermissionsAndroid, Platform, StyleSheet, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import { FlatList, PermissionsAndroid, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+let MapView: any;
+let Marker: any;
+
+if (Platform.OS === 'web') {
+  MapView = require('@teovilla/react-native-web-maps').default;
+  Marker = () => null; // Dummy Marker for web
+} else {
+  MapView = require('react-native-maps').default;
+  Marker = require('react-native-maps').Marker;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  icon: any;
+}
+
+const categories: Category[] = [
+  { id: '1', name: 'Hotels', icon: 'hotel' },
+  { id: '2', name: 'Food', icon: 'food' },
+  { id: '3', name: 'Cafes', icon: 'coffee' },
+  { id: '4', name: 'Parks', icon: 'tree' },
+  { id: '5', name: 'Museums', icon: 'museum' },
+  { id: '6', name: 'Shopping', icon: 'shopping' },
+  { id: '7', name: 'Bars', icon: 'glass-cocktail' },
+  { id: '8', name: 'Events', icon: 'ticket' },
+];
+
+function MapCategoryItem({ item }: { item: Category }) {
+  return (
+    <BlurView intensity={30} tint="dark" style={styles.categoryBlurContainer}>
+      <TouchableOpacity style={styles.categoryItem}>
+        <MaterialCommunityIcons name={item.icon} size={20} color="#fff" />
+        <Text style={styles.categoryText}>{item.name}</Text>
+      </TouchableOpacity>
+    </BlurView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    flex: 1,
+  },
+  overlayContainer: {
+    position: 'absolute',
+    bottom: 80, // Approximate height of the bottom tab bar
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 0,
+  },
+  categoryList: {
+    flex: 1,
+  },
+  horizontalListContent: {
+    alignItems: 'center',
+    paddingRight: 60, // Space for search icon so last item can scroll fully
+  },
+  categoryBlurContainer: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginHorizontal: 5,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    
+  },
+  categoryText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
+  },
+  searchIconBlurContainer: {
+    borderRadius: 30,
+    overflow: 'hidden',
+    marginLeft: 10,
+    padding: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  searchIconContainer: {
+    padding: 5,
+  },
+});
 
 export default function App() {
   const [region, setRegion] = useState({
@@ -37,26 +132,42 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        initialRegion={region}
-        showsUserLocation={true}
-      >
-        <Marker
-          coordinate={{ latitude: 48.1486, longitude: 17.1077 }}
-          title="Bratislava"
-          description="Capital of Slovakia"
+      {Platform.OS === 'web' ? (
+        <MapView
+          style={styles.map}
+          initialRegion={region}
+        >
+          {/* Markers are not directly supported by @teovilla/react-native-web-maps in the same way as react-native-maps */}
+        </MapView>
+      ) : (
+        <MapView
+          style={styles.map}
+          initialRegion={region}
+          showsUserLocation={true}
+        >
+          <Marker
+            coordinate={{ latitude: 48.1486, longitude: 17.1077 }}
+            title="Bratislava"
+            description="Capital of Slovakia"
+          />
+        </MapView>
+      )}
+      <View style={styles.overlayContainer}> 
+        <FlatList
+          data={categories}
+          renderItem={({ item }) => <MapCategoryItem item={item} />}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalListContent}
+          style={styles.categoryList}
         />
-      </MapView>
+        <BlurView intensity={30} tint="dark" style={styles.searchIconBlurContainer}>
+          <TouchableOpacity style={styles.searchIconContainer}>
+            <MaterialCommunityIcons name="magnify" size={30} color="white" />
+          </TouchableOpacity>
+        </BlurView>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
-});
