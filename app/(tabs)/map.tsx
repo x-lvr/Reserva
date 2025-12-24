@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   categoryItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    
+
   },
   categoryText: {
     color: '#fff',
@@ -164,7 +164,7 @@ export default function App() {
           />
         </MapView>
       )}
-      <View style={styles.overlayContainer}> 
+      <View style={styles.overlayContainer}>
         <View style={styles.categoriesWrapper}>
           <FlatList
             data={categories}
