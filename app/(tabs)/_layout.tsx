@@ -3,7 +3,7 @@ import React from 'react';
 
 export default function TabLayout() {
   return (
-    <NativeTabs tintColor="#F59E0B">
+    <NativeTabs tintColor="#00BFA6">
       <NativeTabs.Trigger name="index">
         <Icon sf="house.fill" />
         <Label>Home</Label>

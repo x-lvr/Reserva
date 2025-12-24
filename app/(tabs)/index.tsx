@@ -1,10 +1,11 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { BlurView } from 'expo-blur';
 import { Link } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   FlatList,
   Image,
-  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -13,17 +14,19 @@ import {
   Text,
   TextInput,
   View,
+  useColorScheme
 } from 'react-native';
 
-const ACCENT = '#F59E0B';
+import { Colors } from '@/constants/theme';
+
 const { width } = Dimensions.get('window');
 
 const mockCategories = [
-  { id: '1', title: 'Nails', emoji: '💅' },
-  { id: '2', title: 'Dentist', emoji: '🦷' },
-  { id: '3', title: 'Car Repair', emoji: '🔧' },
-  { id: '4', title: 'Massage', emoji: '💆‍♀️' },
-  { id: '5', title: 'Hair', emoji: '💇‍♂️' },
+  { id: '1', title: 'Nails', icon: 'color-palette-outline', emoji: '💅' },
+  { id: '2', title: 'Dentist', icon: 'medkit-outline', emoji: '🦷' },
+  { id: '3', title: 'Car Repair', icon: 'car-sport-outline', emoji: '🔧' },
+  { id: '4', title: 'Massage', icon: 'body-outline', emoji: '💆‍♀️' },
+  { id: '5', title: 'Hair', icon: 'cut-outline', emoji: '💇‍♂️' },
 ];
 
 const mockNearby = [
@@ -62,6 +65,9 @@ const mockBookings = [
 export default function HomeScreen() {
   const [query, setQuery] = useState('');
   const [nearby, setNearby] = useState(mockNearby);
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? 'light'];
+  const accent = theme.tint;
 
   useEffect(() => {
     // Placeholder for real location-based fetching.
@@ -70,187 +76,189 @@ export default function HomeScreen() {
 
   function renderCategory({ item }: any) {
     return (
-      <Pressable style={styles.categoryCard} key={item.id} android_ripple={{ color: '#eee' }} onPress={() => {}}>
-        <Text style={styles.categoryEmoji}>{item.emoji}</Text>
-        <Text style={styles.categoryTitle}>{item.title}</Text>
-      </Pressable>
+      <BlurView intensity={20} tint={colorScheme === 'dark' ? 'dark' : 'light'} style={styles.categoryBlurContainer} key={item.id}>
+        <Pressable
+          style={({ pressed }) => [styles.categoryCard, pressed && { opacity: 0.7 }]}
+          onPress={() => { }}
+        >
+          <View style={[styles.iconContainer, { backgroundColor: accent + '15' }]}>
+            <Ionicons name={item.icon} size={24} color={accent} />
+          </View>
+          <Text style={[styles.categoryTitle, { color: theme.text }]}>{item.title}</Text>
+        </Pressable>
+      </BlurView>
     );
   }
 
   function renderService({ item }: any) {
     return (
-      <View style={styles.serviceCard}>
+      <Pressable style={[styles.serviceCard, { backgroundColor: theme.background, borderColor: theme.icon + '20', borderWidth: 1 }]}>
         <Image source={{ uri: item.image }} style={styles.serviceImage} />
         <View style={styles.serviceBody}>
-          <Text style={styles.serviceName}>{item.name}</Text>
+          <Text style={[styles.serviceName, { color: theme.text }]}>{item.name}</Text>
           <View style={styles.metaRow}>
-            <Text style={styles.rating}>⭐ {item.rating}</Text>
-            <Text style={styles.distance}>{item.distanceKm} km</Text>
+            <Ionicons name="star" size={14} color="#FFD700" />
+            <Text style={[styles.rating, { color: theme.text, marginLeft: 4 }]}>{item.rating}</Text>
+            <Text style={[styles.distance, { color: theme.icon }]}>• {item.distanceKm} km</Text>
           </View>
           <View style={styles.bookRow}>
-            <Pressable onPress={() => alert('Book ' + item.name)} style={({ pressed }) => [styles.iosButton, pressed && styles.iosButtonPressed]}>
-              <Text style={styles.iosButtonText}>Book Now</Text>
+            <Pressable onPress={() => alert('Book ' + item.name)} style={({ pressed }) => [styles.iosButton, { backgroundColor: accent }, pressed && styles.iosButtonPressed]}>
+              <Text style={styles.iosButtonText}>Book</Text>
             </Pressable>
           </View>
         </View>
-      </View>
+      </Pressable>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle={Platform.OS === 'ios' ? 'dark-content' : 'default'} />
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 32 }}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
+      <ScrollView
+        style={[styles.container, { backgroundColor: theme.background }]}
+        contentContainerStyle={{ paddingBottom: 100, paddingTop: 12 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerRow}>
           <View>
-            <Text style={styles.logo}>Reserva</Text>
-            <Text style={styles.greeting}>Good morning — find services near you</Text>
+            <Text style={[styles.logo, { color: accent }]}>Reserva</Text>
+            <Text style={[styles.greeting, { color: theme.icon }]}>Good morning — find services near you</Text>
           </View>
-          <Pressable style={styles.avatar} onPress={() => alert('Open profile')}>
-            <Text style={styles.avatarText}>R</Text>
+          <Pressable style={[styles.avatar, { backgroundColor: accent + '20' }]} onPress={() => alert('Open profile')}>
+            <Text style={[styles.avatarText, { color: accent }]}>R</Text>
           </Pressable>
         </View>
 
-          <View style={styles.searchContainer}>
-            <View style={styles.searchInner}>
-              <Text style={styles.searchIcon}>🔎</Text>
-              <TextInput
-                placeholder="Search services or providers"
-                value={query}
-                onChangeText={setQuery}
-                style={styles.searchInput}
-                clearButtonMode="while-editing"
-              />
-            </View>
-          </View>
-
-          <View style={[styles.section, styles.card]}>
-            <Text style={styles.sectionTitle}>Categories</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
-              {mockCategories.map((c) => renderCategory({ item: c }))}
-            </ScrollView>
-          </View>
-
-          <View style={[styles.section, styles.card]}>
-            <Text style={styles.sectionTitle}>Featured</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ gap: 12 }}>
-              {mockFeatured.map((f) => (
-                <Pressable key={f.id} style={styles.featureCard} onPress={() => alert(f.title)}>
-                  <Image source={{ uri: f.image }} style={styles.featureImage} />
-                  <View style={styles.featureOverlay}>
-                    <Text style={styles.featureText}>{f.title}</Text>
-                  </View>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </View>
-
-          <View style={[styles.section, styles.card]}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>Nearby</Text>
-              <Link href="/map">
-                <Text style={styles.seeMap}>Open map</Text>
-              </Link>
-            </View>
-
-            <FlatList
-              data={nearby}
-              keyExtractor={(i) => i.id}
-              renderItem={renderService}
-              horizontal={false}
-              scrollEnabled={false}
+        <View style={styles.searchContainer}>
+          <View style={[styles.searchInner, { backgroundColor: colorScheme === 'dark' ? '#1E1E1E' : '#F8FAFC' }]}>
+            <Ionicons name="search" size={20} color={theme.icon} style={{ marginRight: 8 }} />
+            <TextInput
+              placeholder="Search services..."
+              placeholderTextColor={theme.icon}
+              value={query}
+              onChangeText={setQuery}
+              style={[styles.searchInput, { color: theme.text }]}
+              clearButtonMode="while-editing"
             />
           </View>
+        </View>
 
-          <View style={[styles.section, styles.card]}>
-            <Text style={styles.sectionTitle}>Map Preview</Text>
-            <Link href="/map">
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Categories</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
+            {mockCategories.map((c) => renderCategory({ item: c }))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Featured</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
+            {mockFeatured.map((f) => (
+              <Pressable key={f.id} style={styles.featureCard} onPress={() => alert(f.title)}>
+                <Image source={{ uri: f.image }} style={styles.featureImage} />
+                <View style={styles.featureOverlay}>
+                  <Text style={styles.featureText}>{f.title}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Nearby</Text>
+            <Link href="/map" asChild>
+              <Pressable>
+                <Text style={[styles.seeMap, { color: accent }]}>See All</Text>
+              </Pressable>
+            </Link>
+          </View>
+
+          <FlatList
+            data={nearby}
+            keyExtractor={(i) => i.id}
+            renderItem={renderService}
+            horizontal={false}
+            scrollEnabled={false}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Map Preview</Text>
+          <Link href="/map" asChild>
+            <Pressable>
               <Image
                 source={{ uri: 'https://via.placeholder.com/600x200.png?text=Map+Preview' }}
                 style={styles.mapPreview}
               />
-            </Link>
-          </View>
+            </Pressable>
+          </Link>
+        </View>
 
-          <View style={[styles.section, styles.card]}>
-            <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
-            {mockBookings.map((b) => (
-              <View key={b.id} style={styles.bookingCard}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.bookingService}>{b.service}</Text>
-                  <Text style={styles.bookingMeta}>{b.when} • {b.location}</Text>
-                </View>
-                <Pressable onPress={() => alert('Open booking ' + b.id)} style={({ pressed }) => [styles.iosButton, pressed && styles.iosButtonPressed]}>
-                  <Text style={styles.iosButtonText}>View</Text>
-                </Pressable>
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Upcoming Bookings</Text>
+          {mockBookings.map((b) => (
+            <View key={b.id} style={[styles.bookingCard, { borderBottomColor: theme.icon + '20' }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.bookingService, { color: theme.text }]}>{b.service}</Text>
+                <Text style={[styles.bookingMeta, { color: theme.icon }]}>{b.when} • {b.location}</Text>
               </View>
-            ))}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
+              <Pressable onPress={() => alert('Open booking ' + b.id)} style={({ pressed }) => [styles.viewButton, { borderColor: accent }, pressed && { opacity: 0.5 }]}>
+                <Text style={[styles.viewButtonText, { color: accent }]}>View</Text>
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 
-  const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff', paddingTop: 12, paddingHorizontal: 16 },
-    header: { marginBottom: 12 },
-    logo: { fontSize: 28, fontWeight: '700', color: '#111', marginBottom: 8 },
-    searchRow: { flexDirection: 'row', alignItems: 'center' },
-    searchInput: {
-      flex: 1,
-      backgroundColor: '#F3F4F6',
-      borderRadius: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      fontSize: 16,
-    },
-    section: { marginTop: 16 },
-    sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
-    categories: { flexDirection: 'row', gap: 12 },
-    categoryCard: {
-      width: 84,
-      height: 92,
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 12,
-      shadowColor: '#000',
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
-    },
-    categoryEmoji: { fontSize: 28, marginBottom: 6 },
-    categoryTitle: { fontSize: 13, fontWeight: '600' },
-    featureCard: { width: width * 0.8, height: 140, borderRadius: 12, overflow: 'hidden', marginRight: 12 },
-    featureImage: { width: '100%', height: '100%' },
-    featureOverlay: { position: 'absolute', left: 12, bottom: 12 },
-    featureText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-    sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    seeMap: { color: ACCENT, fontWeight: '600' },
-    serviceCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, marginBottom: 12, overflow: 'hidden' },
-    serviceImage: { width: 120, height: 92 },
-    serviceBody: { flex: 1, padding: 10, justifyContent: 'space-between' },
-    serviceName: { fontSize: 16, fontWeight: '700' },
-    metaRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-    rating: { color: '#374151', fontWeight: '600' },
-    distance: { color: '#6B7280' },
-    bookRow: { alignSelf: 'flex-start' },
-    mapPreview: { width: '100%', height: 160, borderRadius: 12 },
-    bookingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-    bookingService: { fontWeight: '700' },
-    bookingMeta: { color: '#6B7280' },
-    safe: { flex: 1, backgroundColor: '#fff' },
-    iosButton: { backgroundColor: ACCENT, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-    iosButtonPressed: { opacity: 0.85 },
-    iosButtonText: { color: '#fff', fontWeight: '700' },
-    card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
-    headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-    greeting: { color: '#6B7280', marginTop: 2 },
-    avatar: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FFF6E5', alignItems: 'center', justifyContent: 'center' },
-    avatarText: { color: '#B45309', fontWeight: '800' },
-    searchContainer: { marginBottom: 12 },
-    searchInner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 6, elevation: 1 },
-    searchIcon: { marginRight: 8, fontSize: 18 },
-    bookingCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-  });
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
+  container: { flex: 1, paddingHorizontal: 20 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, marginTop: 8 },
+  logo: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5 },
+  greeting: { fontSize: 14, fontWeight: '500', marginTop: 4 },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontWeight: '700', fontSize: 18 },
+  searchContainer: { marginBottom: 24 },
+  searchInner: { flexDirection: 'row', alignItems: 'center', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14 },
+  searchInput: { flex: 1, fontSize: 16, fontWeight: '500' },
+  section: { marginBottom: 32 },
+  sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 16 },
+  categories: { flexDirection: 'row', overflow: 'visible' },
+  categoryBlurContainer: { borderRadius: 16, marginRight: 16, overflow: 'hidden' },
+  categoryCard: {
+    width: 100,
+    height: 110,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // backgroundColor: 'transparent' - BlurView handles bg approximation or we can add explicit semi-transparent
+  },
+  iconContainer: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  categoryTitle: { fontSize: 13, fontWeight: '600' },
+  featureCard: { width: width * 0.85, height: 160, borderRadius: 24, overflow: 'hidden', marginRight: 16, backgroundColor: '#000' },
+  featureImage: { width: '100%', height: '100%', opacity: 0.8 },
+  featureOverlay: { position: 'absolute', left: 20, bottom: 20 },
+  featureText: { color: '#fff', fontWeight: '800', fontSize: 20 },
+  sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  seeMap: { fontSize: 14, fontWeight: '600' },
+  serviceCard: { flexDirection: 'row', borderRadius: 20, marginBottom: 16, overflow: 'hidden', padding: 12 },
+  serviceImage: { width: 100, height: 100, borderRadius: 16 },
+  serviceBody: { flex: 1, marginLeft: 16, justifyContent: 'center' },
+  serviceName: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  rating: { fontSize: 14, fontWeight: '600' },
+  distance: { fontSize: 14, marginLeft: 4 },
+  bookRow: { flexDirection: 'row' },
+  iosButton: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 50 },
+  iosButtonPressed: { opacity: 0.8 },
+  iosButtonText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  mapPreview: { width: '100%', height: 180, borderRadius: 24 },
+  bookingCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1 },
+  bookingService: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  bookingMeta: { fontSize: 14 },
+  viewButton: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
+  viewButtonText: { fontSize: 13, fontWeight: '600' },
+});
