@@ -1,49 +1,3 @@
-<<<<<<< HEAD
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Link } from 'expo-router';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-interface Category {
-  id: string;
-  name: string;
-  icon: any;
-}
-
-const categories: Category[] = [
-  { id: '1', name: 'Hotels', icon: 'hotel' },
-  { id: '2', name: 'Flights', icon: 'airplane' },
-  { id: '3', name: 'Cars', icon: 'car' },
-  { id: '4', name: 'Experiences', icon: 'hiking' },
-  { id: '5', name: 'Restaurants', icon: 'food' },
-  { id: '6', name: 'Cruises', icon: 'boat-cruise' },
-  { id: '7', name: 'Trains', icon: 'train' },
-  { id: '8', name: 'Buses', icon: 'bus' },
-  { id: '9', name: 'Events', icon: 'ticket' },
-];
-
-function CategoryItem({ item }: { item: Category }) {
-  return (
-    <Link href={{ pathname: "/category/[id]", params: { id: item.id } }} asChild>
-      <TouchableOpacity style={styles.categoryItem}>
-        <MaterialCommunityIcons name={item.icon} size={30} color="#007AFF" />
-        <Text style={styles.categoryText}>{item.name}</Text>
-      </TouchableOpacity>
-    </Link>
-  );
-}
-
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Categories</Text>
-      <FlatList
-        data={categories}
-        renderItem={({ item }) => <CategoryItem item={item} />}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-      />
-    </View>
-=======
 import { Link } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -157,192 +111,146 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        <View style={styles.searchContainer}>
-          <View style={styles.searchInner}>
-            <Text style={styles.searchIcon}>🔎</Text>
-            <TextInput
-              placeholder="Search services or providers"
-              value={query}
-              onChangeText={setQuery}
-              style={styles.searchInput}
-              clearButtonMode="while-editing"
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInner}>
+              <Text style={styles.searchIcon}>🔎</Text>
+              <TextInput
+                placeholder="Search services or providers"
+                value={query}
+                onChangeText={setQuery}
+                style={styles.searchInput}
+                clearButtonMode="while-editing"
+              />
+            </View>
+          </View>
+
+          <View style={[styles.section, styles.card]}>
+            <Text style={styles.sectionTitle}>Categories</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
+              {mockCategories.map((c) => renderCategory({ item: c }))}
+            </ScrollView>
+          </View>
+
+          <View style={[styles.section, styles.card]}>
+            <Text style={styles.sectionTitle}>Featured</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ gap: 12 }}>
+              {mockFeatured.map((f) => (
+                <Pressable key={f.id} style={styles.featureCard} onPress={() => alert(f.title)}>
+                  <Image source={{ uri: f.image }} style={styles.featureImage} />
+                  <View style={styles.featureOverlay}>
+                    <Text style={styles.featureText}>{f.title}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={[styles.section, styles.card]}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Nearby</Text>
+              <Link href="/map">
+                <Text style={styles.seeMap}>Open map</Text>
+              </Link>
+            </View>
+
+            <FlatList
+              data={nearby}
+              keyExtractor={(i) => i.id}
+              renderItem={renderService}
+              horizontal={false}
+              scrollEnabled={false}
             />
           </View>
-        </View>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-        <View style={[styles.section, styles.card]}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categories}>
-            {mockCategories.map((c) => renderCategory({ item: c }))}
-          </ScrollView>
-        </View>
 
-        <View style={[styles.section, styles.card]}>
-          <Text style={styles.sectionTitle}>Featured</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ gap: 12 }}>
-            {mockFeatured.map((f) => (
-              <Pressable key={f.id} style={styles.featureCard} onPress={() => alert(f.title)}>
-                <Image source={{ uri: f.image }} style={styles.featureImage} />
-                <View style={styles.featureOverlay}>
-                  <Text style={styles.featureText}>{f.title}</Text>
-                </View>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={[styles.section, styles.card]}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Nearby</Text>
+          <View style={[styles.section, styles.card]}>
+            <Text style={styles.sectionTitle}>Map Preview</Text>
             <Link href="/map">
-              <Text style={styles.seeMap}>Open map</Text>
+              <Image
+                source={{ uri: 'https://via.placeholder.com/600x200.png?text=Map+Preview' }}
+                style={styles.mapPreview}
+              />
             </Link>
           </View>
 
-          <FlatList
-            data={nearby}
-            keyExtractor={(i) => i.id}
-            renderItem={renderService}
-            horizontal={false}
-            scrollEnabled={false}
-          />
-        </View>
-
-        <View style={[styles.section, styles.card]}>
-          <Text style={styles.sectionTitle}>Map Preview</Text>
-          <Link href="/map">
-            <Image
-              source={{ uri: 'https://via.placeholder.com/600x200.png?text=Map+Preview' }}
-              style={styles.mapPreview}
-            />
-          </Link>
-        </View>
-
-        <View style={[styles.section, styles.card]}>
-          <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
-          {mockBookings.map((b) => (
-            <View key={b.id} style={styles.bookingCard}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.bookingService}>{b.service}</Text>
-                <Text style={styles.bookingMeta}>{b.when} • {b.location}</Text>
+          <View style={[styles.section, styles.card]}>
+            <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
+            {mockBookings.map((b) => (
+              <View key={b.id} style={styles.bookingCard}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.bookingService}>{b.service}</Text>
+                  <Text style={styles.bookingMeta}>{b.when} • {b.location}</Text>
+                </View>
+                <Pressable onPress={() => alert('Open booking ' + b.id)} style={({ pressed }) => [styles.iosButton, pressed && styles.iosButtonPressed]}>
+                  <Text style={styles.iosButtonText}>View</Text>
+                </Pressable>
               </View>
-              <Pressable onPress={() => alert('Open booking ' + b.id)} style={({ pressed }) => [styles.iosButton, pressed && styles.iosButtonPressed]}>
-                <Text style={styles.iosButtonText}>View</Text>
-              </Pressable>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
->>>>>>> 5f75a0a88659d5e55c57d836b11a828836cf0e46
-  );
-}
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
-const styles = StyleSheet.create({
-<<<<<<< HEAD
-  container: {
-    flex: 1,
-    paddingTop: 20,
-    backgroundColor: '#f0f2f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
-  },
-  listContent: {
-    paddingHorizontal: 10,
-  },
-  categoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 15,
-    marginVertical: 8,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  categoryText: {
-    marginLeft: 15,
-    fontSize: 18,
-    color: '#333',
-=======
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 12, paddingHorizontal: 16 },
-  header: { marginBottom: 12 },
-  logo: { fontSize: 28, fontWeight: '700', color: '#111', marginBottom: 8 },
-  searchRow: { flexDirection: 'row', alignItems: 'center' },
-  searchInput: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  section: { marginTop: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
-  categories: { flexDirection: 'row', gap: 12 },
-  categoryCard: {
-    width: 84,
-    height: 92,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
->>>>>>> 5f75a0a88659d5e55c57d836b11a828836cf0e46
-  },
-  categoryEmoji: { fontSize: 28, marginBottom: 6 },
-  categoryTitle: { fontSize: 13, fontWeight: '600' },
-  featureCard: { width: width * 0.8, height: 140, borderRadius: 12, overflow: 'hidden', marginRight: 12 },
-  featureImage: { width: '100%', height: '100%' },
-  featureOverlay: { position: 'absolute', left: 12, bottom: 12 },
-  featureText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  seeMap: { color: ACCENT, fontWeight: '600' },
-  serviceCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, marginBottom: 12, overflow: 'hidden' },
-  serviceImage: { width: 120, height: 92 },
-  serviceBody: { flex: 1, padding: 10, justifyContent: 'space-between' },
-  serviceName: { fontSize: 16, fontWeight: '700' },
-  metaRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  rating: { color: '#374151', fontWeight: '600' },
-  distance: { color: '#6B7280' },
-  bookRow: { alignSelf: 'flex-start' },
-  mapPreview: { width: '100%', height: 160, borderRadius: 12 },
-  bookingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-  bookingService: { fontWeight: '700' },
-  bookingMeta: { color: '#6B7280' },
-  safe: { flex: 1, backgroundColor: '#fff' },
-  iosButton: { backgroundColor: ACCENT, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  iosButtonPressed: { opacity: 0.85 },
-  iosButtonText: { color: '#fff', fontWeight: '700' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  greeting: { color: '#6B7280', marginTop: 2 },
-  avatar: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FFF6E5', alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: '#B45309', fontWeight: '800' },
-  searchContainer: { marginBottom: 12 },
-  searchInner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 6, elevation: 1 },
-  searchIcon: { marginRight: 8, fontSize: 18 },
-  bookingCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-});
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: '#fff', paddingTop: 12, paddingHorizontal: 16 },
+    header: { marginBottom: 12 },
+    logo: { fontSize: 28, fontWeight: '700', color: '#111', marginBottom: 8 },
+    searchRow: { flexDirection: 'row', alignItems: 'center' },
+    searchInput: {
+      flex: 1,
+      backgroundColor: '#F3F4F6',
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 16,
+    },
+    section: { marginTop: 16 },
+    sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
+    categories: { flexDirection: 'row', gap: 12 },
+    categoryCard: {
+      width: 84,
+      height: 92,
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    categoryEmoji: { fontSize: 28, marginBottom: 6 },
+    categoryTitle: { fontSize: 13, fontWeight: '600' },
+    featureCard: { width: width * 0.8, height: 140, borderRadius: 12, overflow: 'hidden', marginRight: 12 },
+    featureImage: { width: '100%', height: '100%' },
+    featureOverlay: { position: 'absolute', left: 12, bottom: 12 },
+    featureText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+    sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    seeMap: { color: ACCENT, fontWeight: '600' },
+    serviceCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, marginBottom: 12, overflow: 'hidden' },
+    serviceImage: { width: 120, height: 92 },
+    serviceBody: { flex: 1, padding: 10, justifyContent: 'space-between' },
+    serviceName: { fontSize: 16, fontWeight: '700' },
+    metaRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+    rating: { color: '#374151', fontWeight: '600' },
+    distance: { color: '#6B7280' },
+    bookRow: { alignSelf: 'flex-start' },
+    mapPreview: { width: '100%', height: 160, borderRadius: 12 },
+    bookingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+    bookingService: { fontWeight: '700' },
+    bookingMeta: { color: '#6B7280' },
+    safe: { flex: 1, backgroundColor: '#fff' },
+    iosButton: { backgroundColor: ACCENT, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+    iosButtonPressed: { opacity: 0.85 },
+    iosButtonText: { color: '#fff', fontWeight: '700' },
+    card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
+    headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+    greeting: { color: '#6B7280', marginTop: 2 },
+    avatar: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FFF6E5', alignItems: 'center', justifyContent: 'center' },
+    avatarText: { color: '#B45309', fontWeight: '800' },
+    searchContainer: { marginBottom: 12 },
+    searchInner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 6, elevation: 1 },
+    searchIcon: { marginRight: 8, fontSize: 18 },
+    bookingCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  });

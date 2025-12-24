@@ -14,3 +14,6 @@ if (Platform.OS === 'web') {
 export { MapView, Marker };
 
 
+
+
+

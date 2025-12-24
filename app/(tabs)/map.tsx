@@ -55,17 +55,23 @@ const styles = StyleSheet.create({
     bottom: 80, // Approximate height of the bottom tab bar
     left: 0,
     right: 0,
-    flexDirection: 'row',
+    height: 120,
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 0,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 12,
   },
   categoryList: {
     flex: 1,
   },
+  categoriesWrapper: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 12,
+  },
   horizontalListContent: {
     alignItems: 'center',
-    paddingRight: 60, // Space for search icon so last item can scroll fully
+    paddingRight: 24, // Space so last item can scroll fully
   },
   categoryBlurContainer: {
     borderRadius: 20,
@@ -88,10 +94,16 @@ const styles = StyleSheet.create({
   searchIconBlurContainer: {
     borderRadius: 30,
     overflow: 'hidden',
-    marginLeft: 10,
-    padding: 5,
+    padding: 6,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  searchBox: {
+    position: 'absolute',
+    right: 12,
+    bottom: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   searchIconContainer: {
     padding: 5,
@@ -153,20 +165,25 @@ export default function App() {
         </MapView>
       )}
       <View style={styles.overlayContainer}> 
-        <FlatList
-          data={categories}
-          renderItem={({ item }) => <MapCategoryItem item={item} />}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalListContent}
-          style={styles.categoryList}
-        />
-        <BlurView intensity={30} tint="dark" style={styles.searchIconBlurContainer}>
-          <TouchableOpacity style={styles.searchIconContainer}>
-            <MaterialCommunityIcons name="magnify" size={30} color="white" />
-          </TouchableOpacity>
-        </BlurView>
+        <View style={styles.categoriesWrapper}>
+          <FlatList
+            data={categories}
+            renderItem={({ item }) => <MapCategoryItem item={item} />}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalListContent}
+            style={styles.categoryList}
+          />
+        </View>
+
+        <View style={styles.searchBox} pointerEvents="box-none">
+          <BlurView intensity={30} tint="dark" style={styles.searchIconBlurContainer}>
+            <TouchableOpacity style={styles.searchIconContainer}>
+              <MaterialCommunityIcons name="magnify" size={30} color="white" />
+            </TouchableOpacity>
+          </BlurView>
+        </View>
       </View>
     </View>
   );
